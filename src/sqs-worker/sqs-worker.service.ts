@@ -1,11 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  DeleteMessageCommand,
-  Message,
-  ReceiveMessageCommand,
-  SQSClient,
-} from '@aws-sdk/client-sqs';
+import { DeleteMessageCommand, Message, ReceiveMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import { TasksService } from 'src/tasks/tasks.service';
 
 @Injectable()
@@ -24,19 +19,16 @@ export class SqsWorkerService {
       region: this.configService.get('APP_AWS_REGION') as string,
       credentials: {
         accessKeyId: this.configService.get('APP_AWS_ACCESS_KEY_ID') as string,
-        secretAccessKey: this.configService.get(
-          'APP_AWS_SECRET_ACCESS_KEY',
-        ) as string,
+        secretAccessKey: this.configService.get('APP_AWS_SECRET_ACCESS_KEY') as string,
       },
     });
 
-    const EXCAMPLE_QUEUE_URL =
-      this.configService.get<string>('EXCAMPLE_QUEUE_URL') || '';
+    // list sqs url
+    const EXCAMPLE_QUEUE_URL = this.configService.get<string>('EXCAMPLE_QUEUE_URL') || '';
 
     // ตั้ง mapping queue → handler
     this.queueHandlers = {
-      [EXCAMPLE_QUEUE_URL]: (message: Message): Promise<void> =>
-        this.tasksService.taskTest(message),
+      [EXCAMPLE_QUEUE_URL]: (message: Message): Promise<void> => this.tasksService.taskTest(message),
     };
   }
 
@@ -46,10 +38,7 @@ export class SqsWorkerService {
     }
   }
 
-  async spawnWorker(
-    queueUrl: string,
-    handler: (message: Message) => Promise<void>,
-  ) {
+  async spawnWorker(queueUrl: string, handler: (message: Message) => Promise<void>) {
     this.logger.log(`Worker started for queue: ${queueUrl}`);
 
     while (true) {
@@ -81,18 +70,12 @@ export class SqsWorkerService {
             this.logger.log(`Message processed & deleted from ${queueUrl}`);
           } catch (error) {
             this.logger.error(
-              `Error processing message from ${queueUrl}: ${
-                error instanceof Error ? error.message : 'Unknown error'
-              }`,
+              `Error processing message from ${queueUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`,
             );
           }
         }
       } catch (error) {
-        this.logger.error(
-          `Error polling ${queueUrl}: ${
-            error instanceof Error ? error.message : 'Unknown error'
-          }`,
-        );
+        this.logger.error(`Error polling ${queueUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         await this.sleep(5000);
       }
     }
