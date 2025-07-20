@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // ดึง JWT จาก Authorization Header
       ignoreExpiration: false, // ไม่ให้ข้ามการตรวจสอบ Expiration
-      secretOrKey: process.env.JWT_SECRET, // ใช้ key ที่ใช้ในการเซ็น JWT
+      secretOrKey: process.env.JWT_SECRET || 'fallback-secret-key', // ใช้ key ที่ใช้ในการเซ็น JWT
     });
   }
 
