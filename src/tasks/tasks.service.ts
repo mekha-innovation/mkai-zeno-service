@@ -3,5 +3,7 @@ import { Message } from '@aws-sdk/client-sqs';
 
 @Injectable()
 export class TasksService {
-  async taskTest(message: Message) {}
+  async taskTest(_message: Message) {
+    // todo: implement task test
+  }
 }
