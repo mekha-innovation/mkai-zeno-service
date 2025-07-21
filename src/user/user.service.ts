@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './schemas/user.schema';
+import { User, UserType } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/user.dto';
@@ -21,8 +21,8 @@ export class UserService {
     return this.userModel.findById(id).exec();
   }
 
-  async existsEmail(email: string): Promise<boolean> {
-    const exists = await this.userModel.exists({ email }).exec();
+  async existsEmail(email: string, type: UserType): Promise<boolean> {
+    const exists = await this.userModel.exists({ email, type }).exec();
     return exists !== null;
   }
 

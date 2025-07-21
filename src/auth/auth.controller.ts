@@ -19,7 +19,17 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: { user: GoogleProfile }, @Res() res: Response) {
-    const { access_token, refresh_token } = await this.authService.generateToken(req.user, UserType.Google);
+    const { access_token, refresh_token } = await this.authService.generateTokenGoogle(req.user, UserType.Google);
+    const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
+
+    // redirect ไปยัง frontend
+    return res.redirect(url);
+  }
+
+  @Post('line/login')
+  async lineAuth(@Body() data: { token: string }, @Res() res: Response) {
+    const profile = this.authService.decodeIdTokenLine(data.token);
+    const { access_token, refresh_token } = await this.authService.generateTokenLine(profile, UserType.Line);
     const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
 
     // redirect ไปยัง frontend

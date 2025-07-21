@@ -7,7 +7,8 @@ import { RevokedToken } from './schemas/revoke-token.schema';
 import { BadRequestException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { User, UserType } from 'src/user/schemas/user.schema';
-import { GoogleProfile, JwtPayload } from './interfaces/jwt-payload.interface';
+import { GoogleProfile, JwtPayload, LineIdTokenPayload } from './interfaces/jwt-payload.interface';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,14 @@ export class AuthService {
     return 'Hello Auth!';
   }
 
+  decodeIdTokenLine(idToken: string) {
+    const decoded = jwt.decode(idToken, { complete: true });
+    if (!decoded) throw new Error('Invalid ID Token');
+    else {
+      return decoded.payload as LineIdTokenPayload;
+    }
+  }
+
   async verifyToken(token: string): Promise<JwtPayload> {
     const isRevoked = await this.isTokenRevoked(token);
     if (isRevoked) {
@@ -38,8 +47,46 @@ export class AuthService {
     }
   }
 
-  async generateToken(user: GoogleProfile, type: UserType): Promise<{ access_token: string; refresh_token: string }> {
-    const userExists = await this.userService.existsEmail(user.emails[0].value);
+  async generateTokenLine(
+    user: LineIdTokenPayload,
+    type: UserType,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const userExists = await this.userService.existsEmail(user.email, type);
+    let newUser: User | null;
+
+    if (!userExists) {
+      // ถ้าไม่มีผู้ใช้ สร้างผู้ใช้ใหม่
+      newUser = await this.userService.create({
+        email: user.email,
+        displayName: user.name,
+        picture: user.picture,
+        type,
+      });
+    } else {
+      // ถ้ามีผู้ใช้แล้ว ค้นหาผู้ใช้
+      newUser = await this.userService.findByEmail(user.email);
+    }
+
+    const payload = { email: user.email, sub: newUser?._id };
+
+    // ใช้ JWT Service เพื่อสร้าง token
+    return {
+      access_token: this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRATION,
+      }),
+      refresh_token: this.jwtService.sign(payload, {
+        secret: process.env.REFRESH_JWT_SECRET, // คีย์สำหรับ Refresh Token
+        expiresIn: process.env.REFRESH_JWT_EXPIRATION, // เวลาหมดอายุของ Refresh Token
+      }),
+    };
+  }
+
+  async generateTokenGoogle(
+    user: GoogleProfile,
+    type: UserType,
+  ): Promise<{ access_token: string; refresh_token: string }> {
+    const userExists = await this.userService.existsEmail(user.emails[0].value, type);
     let newUser: User | null;
 
     if (!userExists) {

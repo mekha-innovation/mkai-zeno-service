@@ -14,3 +14,15 @@ export interface GoogleProfile {
   emails: { value: string }[];
   photos: { value: string }[];
 }
+
+export interface LineIdTokenPayload {
+  iss: string; // issuer
+  sub: string; // LINE userId
+  aud: string; // channelId ของคุณ
+  exp: number;
+  iat: number;
+  nonce?: string;
+  name?: string;
+  picture?: string;
+  email: string;
+}
