@@ -7,7 +7,7 @@ import { RevokedToken } from './schemas/revoke-token.schema';
 import { BadRequestException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { User, UserType } from 'src/user/schemas/user.schema';
-import { GoogleProfile, JwtPayload, LineIdTokenPayload } from './interfaces/jwt-payload.interface';
+import { GoogleProfile, JwtPayload, LineIdTokenPayload, LineProfile } from './interfaces/jwt-payload.interface';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -47,10 +47,7 @@ export class AuthService {
     }
   }
 
-  async generateTokenLine(
-    user: LineIdTokenPayload,
-    type: UserType,
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  async generateTokenLine(user: LineProfile, type: UserType): Promise<{ access_token: string; refresh_token: string }> {
     const userExists = await this.userService.existsEmail(user.email, type);
     let newUser: User | null;
 
@@ -58,8 +55,8 @@ export class AuthService {
       // ถ้าไม่มีผู้ใช้ สร้างผู้ใช้ใหม่
       newUser = await this.userService.create({
         email: user.email,
-        displayName: user.name,
-        picture: user.picture,
+        displayName: user.displayName,
+        picture: user.pictureUrl,
         type,
       });
     } else {

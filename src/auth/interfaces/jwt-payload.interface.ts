@@ -26,3 +26,11 @@ export interface LineIdTokenPayload {
   picture?: string;
   email: string;
 }
+
+// Define the expected shape of the LINE profile response
+export interface LineProfile {
+  userId: string;
+  displayName: string;
+  pictureUrl?: string;
+  email: string;
+}

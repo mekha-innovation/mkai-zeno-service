@@ -5,6 +5,7 @@ import { RefreshTokenDto, RefreshTokenResponseDto, RevokeTokenDto } from './dto/
 import { Response } from 'express';
 import { UserType } from '../user/schemas/user.schema';
 import { GoogleProfile } from './interfaces/jwt-payload.interface';
+import { LineProfile } from './interfaces/jwt-payload.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -26,10 +27,27 @@ export class AuthController {
     return res.redirect(url);
   }
 
-  @Post('line/login')
-  async lineAuth(@Body() data: { token: string }, @Res() res: Response) {
-    const profile = this.authService.decodeIdTokenLine(data.token);
-    const { access_token, refresh_token } = await this.authService.generateTokenLine(profile, UserType.Line);
+  // @Post('line/login')
+  // async lineAuth(@Body() data: { token: string }, @Res() res: Response) {
+  //   const profile = this.authService.decodeIdTokenLine(data.token);
+  //   const { access_token, refresh_token } = await this.authService.generateTokenLine(profile, UserType.Line);
+  //   const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
+
+  //   // redirect ไปยัง frontend
+  //   return res.redirect(url);
+  // }
+
+  @Get('line')
+  @UseGuards(AuthGuard('line'))
+  async lineLogin() {
+    // ตรงนี้จะ redirect ไป LINE Login
+  }
+
+  @Get('line/callback')
+  @UseGuards(AuthGuard('line'))
+  async lineCallback(@Req() req: { user: LineProfile }, @Res() res: Response) {
+    // ตรงนี้จะรับ user ข้อมูลที่ validate ส่งกลับมา
+    const { access_token, refresh_token } = await this.authService.generateTokenLine(req.user, UserType.Line);
     const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
 
     // redirect ไปยัง frontend
