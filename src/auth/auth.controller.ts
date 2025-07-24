@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenDto, RefreshTokenResponseDto, RevokeTokenDto } from './dto/refetch_token.dto';
 import { Response } from 'express';
 import { UserType } from '../user/schemas/user.schema';
-import { GoogleProfile } from './interfaces/jwt-payload.interface';
+import { GoogleConvertProfile } from './interfaces/jwt-payload.interface';
 import { LineProfile } from './interfaces/jwt-payload.interface';
 
 @Controller('auth')
@@ -19,7 +19,7 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: { user: GoogleProfile }, @Res() res: Response) {
+  async googleAuthRedirect(@Req() req: { user: GoogleConvertProfile }, @Res() res: Response) {
     const { access_token, refresh_token } = await this.authService.generateTokenGoogle(req.user, UserType.Google);
     const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
 

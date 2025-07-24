@@ -15,6 +15,15 @@ export interface GoogleProfile {
   photos: { value: string }[];
 }
 
+export interface GoogleConvertProfile {
+  email: string;
+  firstName: string;
+  lastName: string;
+  picture: string;
+  accessToken: string;
+  refreshToken?: string;
+}
+
 export interface LineIdTokenPayload {
   iss: string; // issuer
   sub: string; // LINE userId

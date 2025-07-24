@@ -7,7 +7,7 @@ import { RevokedToken } from './schemas/revoke-token.schema';
 import { BadRequestException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { User, UserType } from 'src/user/schemas/user.schema';
-import { GoogleProfile, JwtPayload, LineIdTokenPayload, LineProfile } from './interfaces/jwt-payload.interface';
+import { GoogleConvertProfile, JwtPayload, LineIdTokenPayload, LineProfile } from './interfaces/jwt-payload.interface';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -80,27 +80,27 @@ export class AuthService {
   }
 
   async generateTokenGoogle(
-    user: GoogleProfile,
+    user: GoogleConvertProfile,
     type: UserType,
   ): Promise<{ access_token: string; refresh_token: string }> {
-    const userExists = await this.userService.existsEmail(user.emails[0].value, type);
+    const userExists = await this.userService.existsEmail(user.email, type);
     let newUser: User | null;
 
     if (!userExists) {
       // ถ้าไม่มีผู้ใช้ สร้างผู้ใช้ใหม่
       newUser = await this.userService.create({
-        email: user.emails[0].value,
-        firstName: user.name.givenName,
-        lastName: user.name.familyName,
-        picture: user.photos[0].value,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        picture: user.picture,
         type,
       });
     } else {
       // ถ้ามีผู้ใช้แล้ว ค้นหาผู้ใช้
-      newUser = await this.userService.findByEmail(user.emails[0].value);
+      newUser = await this.userService.findByEmail(user.email);
     }
 
-    const payload = { email: user.emails[0].value, sub: newUser?._id };
+    const payload = { email: user.email, picture: user.picture, sub: newUser?._id };
 
     // ใช้ JWT Service เพื่อสร้าง token
     return {
