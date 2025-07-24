@@ -64,7 +64,7 @@ export class AuthService {
       newUser = await this.userService.findByEmail(user.email);
     }
 
-    const payload = { email: user.email, sub: newUser?._id };
+    const payload = { email: user.email, picture: newUser?.picture, sub: newUser?._id };
 
     // ใช้ JWT Service เพื่อสร้าง token
     return {

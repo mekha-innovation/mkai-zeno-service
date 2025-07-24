@@ -5,6 +5,7 @@ import { Strategy } from 'passport-oauth2';
 import { Profile } from 'passport';
 import axios from 'axios';
 import { LineProfile } from '../interfaces/jwt-payload.interface';
+import { VerifyCallback } from 'jsonwebtoken';
 
 @Injectable()
 export class LineStrategy extends PassportStrategy(Strategy, 'line') {
@@ -24,27 +25,20 @@ export class LineStrategy extends PassportStrategy(Strategy, 'line') {
     });
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: string,
-    params: any,
-    profile: Profile,
-    done: (error: any, user?: any) => void,
-  ) {
-    // เรียก LINE Profile API
+  async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback): Promise<any> {
     const response = await axios.get<LineProfile>('https://api.line.me/v2/profile', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+
     const data = response.data;
 
-    const user = {
-      lineId: data.userId,
+    done(null, {
+      email: data.email || data.userId,
+      userId: data.userId,
       displayName: data.displayName,
       pictureUrl: data.pictureUrl ?? null,
       accessToken,
       refreshToken,
-    };
-
-    done(null, user);
+    });
   }
 }

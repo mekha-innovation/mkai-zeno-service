@@ -7,7 +7,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { RevokedToken, RevokedTokenSchema } from './schemas/revoke-token.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from 'src/user/user.module';
-// import { LineStrategy } from './strategies/line.strategy';
+import { LineStrategy } from './strategies/line.strategy';
 
 @Module({
   imports: [
@@ -26,11 +26,6 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    GoogleStrategy,
-    JwtStrategy,
-    // LineStrategy
-  ],
+  providers: [AuthService, GoogleStrategy, JwtStrategy, LineStrategy],
 })
 export class AuthModule {}
