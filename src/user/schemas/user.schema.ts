@@ -7,6 +7,12 @@ export enum UserType {
   Line = 'line',
 }
 
+export enum PlanType {
+  Free = 'Free',
+  Pro = 'Pro',
+  Enterprise = 'Enterprise',
+}
+
 @Schema({ timestamps: true }) // เพิ่ม timestamps สำหรับ createdAt และ updatedAt
 export class User extends Document {
   @Prop({ required: true, unique: true })
@@ -23,6 +29,14 @@ export class User extends Document {
 
   @Prop({ type: String, enum: UserType, default: UserType.Google })
   type: UserType;
+
+  @Prop({ type: String, enum: PlanType, default: PlanType.Free })
+  plan: PlanType;
+
+  // เพิ่ม TypeScript type สำหรับ timestamps
+  createdAt?: Date;
+
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
