@@ -19,6 +19,9 @@ export class User extends Document {
   email: string;
 
   @Prop({ default: '' })
+  displayName: string;
+
+  @Prop({ default: '' })
   firstName: string;
 
   @Prop({ default: '' })

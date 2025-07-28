@@ -15,6 +15,11 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: '*', // ปรับตาม origin ที่ frontend ใช้จริง
+    // credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('My API')
     .setDescription('API description')
