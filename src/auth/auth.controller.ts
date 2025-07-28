@@ -27,16 +27,6 @@ export class AuthController {
     return res.redirect(url);
   }
 
-  // @Post('line/login')
-  // async lineAuth(@Body() data: { token: string }, @Res() res: Response) {
-  //   const profile = this.authService.decodeIdTokenLine(data.token);
-  //   const { access_token, refresh_token } = await this.authService.generateTokenLine(profile, UserType.Line);
-  //   const url = `${process.env.FRONTEND_REDIRECT_URL}?access_token=${access_token}&refresh_token=${refresh_token}`;
-
-  //   // redirect ไปยัง frontend
-  //   return res.redirect(url);
-  // }
-
   @Get('line')
   @UseGuards(AuthGuard('line'))
   async lineLogin() {
