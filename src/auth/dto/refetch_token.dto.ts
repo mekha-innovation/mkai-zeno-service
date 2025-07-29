@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class VerifyTokenDto {
+  @ApiProperty()
+  token: string;
+}
+
 export class RefreshTokenDto {
   @ApiProperty()
   refreshToken: string;

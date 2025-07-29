@@ -1,7 +1,7 @@
 import { Controller, Get, Post, UseGuards, Req, Res, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RefreshTokenDto, RefreshTokenResponseDto, RevokeTokenDto } from './dto/refetch_token.dto';
+import { RefreshTokenDto, RefreshTokenResponseDto, RevokeTokenDto, VerifyTokenDto } from './dto/refetch_token.dto';
 import { Response } from 'express';
 import { UserType } from '../user/schemas/user.schema';
 import { GoogleConvertProfile } from './interfaces/jwt-payload.interface';
@@ -50,7 +50,7 @@ export class AuthController {
   }
 
   @Post('verify')
-  verifyToken(@Body() data: { token: string }) {
+  verifyToken(@Body() data: VerifyTokenDto) {
     return this.authService.verifyToken(data.token);
   }
 
